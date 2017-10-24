@@ -26,17 +26,17 @@ addNode <- function(G, node) {
 }
 
 #' Afegeix un atribut a un node
-addNodeAttr <- function(G, node, attr) {
-    eval.parent(substitute(G@nodes[[toString(node)]][toString(names(attr))] <- attr))
+addNodeAttrs <- function(G, node, attrlist) {
+    keys <- names(attrlist)
+    for (i in 1: length(attrlist)) {
+        eval.parent(substitute(G@nodes[[toString(node)]][toString(keys[i])] <- attrlist[i]))
+    }
 }
 
 #' Afegeix un node amb atributs
 addNodeWithAttrs <- function(G, node, attrlist) {
     eval.parent(substitute(addNode(G, node)))
-    keys <- names(attrlist)
-    for (i in 1: length(attrlist)) {
-        eval.parent(substitute(addNodeAttr(G, node, attrlist[i])))
-    }
+    eval.parent(substitute(addNodeAttrs(G, node, attrlist)))
 }
 
 #' Afegeix nodes procedents d'una llista 'c' -no permet atributs-
@@ -72,14 +72,23 @@ graph@nodes$node_2$attr_3
 
 addNode(graph, 'node_3')
 #addNodeAttr(graph, 'node_3', 'attr_5', 'value_5')
-addNodeAttr(graph, 'node_3', list('attr6'='value_7'))
-graph@nodes$node_3
+
+addNodeAttrs(graph, 'node_3', list('attr6'='value_7'))
+graph@nodes$node_3$attr6
 
 View(graph@nodes$node_3)
 
 addNodesFrom(graph, c(1,2,3,4,5,'holaaaNode'))
 graph@nodes
 
-addNodeAttr(graph, 1, list('attr11111'='value_111111'))
+addNodeAttrs(graph, 1, list('attr11111'='value_111111'))
+
+addNodeAttrs(graph, 'node_1', list('asdasdasd'='gdfgdgdfg'))
 View(graph@nodes)
+
+graph@nodes$'1'$attr11111
+
+graph@nodes$'1'$pp <- 'pallllllllll'
+
+graph@nodes$'1'$pp
 
