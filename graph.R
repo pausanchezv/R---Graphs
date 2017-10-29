@@ -29,6 +29,7 @@ addNode <- function(G, node) {
 
 #' Afegeix un atribut a un node
 addNodeAttrs <- function(G, node, attrs) {
+    
     keys <- names(attrs)
     for (i in 1: length(attrs)) {
         eval.parent(substitute(G@nodes[[toString(node)]][toString(keys[i])] <- attrs[i]))
@@ -37,19 +38,34 @@ addNodeAttrs <- function(G, node, attrs) {
 
 #' Afegeix un node amb atributs
 addNodeWithAttrs <- function(G, node, attrs) {
+    
     eval.parent(substitute(addNode(G, node)))
     eval.parent(substitute(addNodeAttrs(G, node, attrs)))
 }
 
 #' Afegeix nodes procedents d'una llista 'c' -no permet atributs-
 addNodesFrom <- function(G, nodelist) {
+    
     for (i in 1:length(nodelist)) {
         eval.parent(substitute(addNode(G, nodelist[i])))
     }
 }
 
 #' Elimina un node del graph
+#' Si el node estava connectat, eliminatotes les arestes de connexió al node
 removeNode <- function(G, node) {
+    
+    node <- toString(node)
+    
+    for (i in 1:length(G@edges)) {
+        
+        edge <- unlist(strsplit(toString(names(graph@edges[i])), split=" "))
+        
+        if (node %in% edge) {
+            eval.parent(substitute(removeEdge(G, edge[1], edge[2])))
+        }
+    }
+    
     eval.parent(substitute(G@nodes[toString(node)] <- NULL))
 }
 
@@ -103,7 +119,8 @@ hasEdge <- function(G, blackNode, redNode) {
 }
 
 
-#' Elimina una aresta del graph
+#' Elimina una aresta del graph,
+#' I elimina la relació de veïnat de l'aresta a la llista d'adjacència de veïns
 removeEdge <- function(G, blackNode, redNode) {
     
     blackNode <- toString(blackNode)
@@ -118,14 +135,13 @@ removeEdge <- function(G, blackNode, redNode) {
     eval.parent(substitute(G@neighbors[[blackNode]] <- G@neighbors[[blackNode]][-blackIndex]))
     eval.parent(substitute(G@neighbors[[redNode]] <- G@neighbors[[redNode]][-redIndex]))
     
-    if (length(G@neighbors$blackNode) < 1) {
+    if (length(eval.parent(substitute(G@neighbors$blackNode))) < 1) {
         eval.parent(substitute(G@neighbors$blackNode <- NULL))
     }
     
-   " if (length(G@neighbors$redNode) < 1) {
+    if (length(eval.parent(substitute(G@neighbors$redNode))) < 1) {
         eval.parent(substitute(G@neighbors$redNode <- NULL))
-    }"
-    
+    }
 }
 
 
@@ -173,6 +189,8 @@ hasEdge(graph, 20,10)
 
 graph@neighbors
 
-removeEdge(graph, 20,10)
+#removeEdge(graph, 20,10)
 
-length(graph@neighbors)
+length(graph@neighbors['20'])
+
+removeNode(graph, 20)
