@@ -1,6 +1,3 @@
-
-library(pryr)
-
 #' Tipus de dades abstracte per representar el graph
 #' Conté un diccionari de nodes i un diccionari d'arestes
 #' Cada node del graph és un diccionari d'atributs
@@ -56,13 +53,15 @@ addNodesFrom <- function(G, nodelist) {
 removeNode <- function(G, node) {
     
     node <- toString(node)
+    keys <- names(graph@edges)
     
     for (i in 1:length(G@edges)) {
         
-        edge <- unlist(strsplit(toString(names(graph@edges[i])), split=" "))
+        edge <- unlist(strsplit(toString(keys[i]), split=" "))
         
         if (node %in% edge) {
             eval.parent(substitute(removeEdge(G, edge[1], edge[2])))
+            eval.parent(substitute(removeEdge(G, edge[2], edge[1])))
         }
     }
     
@@ -108,6 +107,24 @@ addEdge <- function(G, edge) {
     eval.parent(substitute(G@neighbors$blackNode <- unique(G@neighbors$blackNode)))
 }
 
+#' Afegeix atributs a l'aresta
+addEdgeAttributes <- function(G, edge, attrs) {
+    
+    edge <- paste(toString(edge[1]), toString(edge[2]))
+    keys <- names(attrs)
+    
+    for (i in 1: length(attrs)) {
+        eval.parent(substitute(G@edges$edge[toString(keys[i])] <- attrs[i]))
+    }
+}
+
+#' afegeix una aresta directament amb atributs
+addEdgeWithAttributes <- function(G, edge, attrs) {
+    
+    eval.parent(substitute(addEdge(G, edge)))
+    eval.parent(substitute(addEdgeAttributes(G, edge, attrs)))
+}
+
 
 #' Retorna true si existeix una aresta, false en cas contrari
 hasEdge <- function(G, blackNode, redNode) {
@@ -145,52 +162,3 @@ removeEdge <- function(G, blackNode, redNode) {
 }
 
 
-graph <- new("Graph")
-print (pryr::address(graph))
-
-
-addNodeWithAttrs(graph, 'node_1', list('attr_1'='value_1', 'attr_2'='value_2'))
-addNodeWithAttrs(graph, 'node_2', list('attr_3'='value_3', 'attr_4'='value_4'))
-graph@nodes$node_2$attr_3
-
-addNode(graph, 'node_3')
-#addNodeAttr(graph, 'node_3', 'attr_5', 'value_5')
-
-addNodeAttrs(graph, 'node_3', list('attr6'='value_7'))
-graph@nodes$node_3$attr6
-
-
-addNodesFrom(graph, c(1,2,3,4,5,'holaaaNode'))
-graph@nodes
-
-addNodeAttrs(graph, 1, list('attr11111'='value_111111'))
-
-addNodeAttrs(graph, 'node_1', list('asdasdasd'='gdfgdgdfg','jjj'='ooop'))
-View(graph@nodes)
-
-graph@nodes$'1'$attr11111
-
-graph@nodes$'1'$pp <- 'pallllllllll'
-
-graph@nodes$'1'$pp
-
-addEdge(graph, c(10,20))
-addEdge(graph, c(10,30))
-graph@edges
-View((graph@edges))
-View(graph@neighbors)
-
-class(names(graph@neighbors))
-
-length(graph@neighbors$'10')
-
-
-hasEdge(graph, 20,10)
-
-graph@neighbors
-
-#removeEdge(graph, 20,10)
-
-length(graph@neighbors['20'])
-
-removeNode(graph, 20)
