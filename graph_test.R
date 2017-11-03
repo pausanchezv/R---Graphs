@@ -1,4 +1,4 @@
-source(graph.R)
+source('graph.R')
 
 # es crea el node
 graph <- new("Graph")
